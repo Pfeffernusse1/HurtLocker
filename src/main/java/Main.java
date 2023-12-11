@@ -24,7 +24,7 @@ public class Main {
     }
 
     public static Map<String, List<String>> mainParse(String data) throws Exception {
-        Map<String, List<String>> map = new HashMap<>();
+        Map<String, List<String>> map = new LinkedHashMap<>();
         String regex = "##";
         Pattern pattern = Pattern.compile(regex);
         String[] items = pattern.split(data);
