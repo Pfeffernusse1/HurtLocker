@@ -28,7 +28,7 @@ public class Main {
 //        }
         // temp[0] = {name: milk}
         Pattern newPattern = Pattern.compile(":(.+)");
-        for (String items : temp) {
+        for(String items: temp){
             String[] newTemp = newPattern.split(items);
             itemList.add(newTemp[0]);
             //System.out.println(output);
