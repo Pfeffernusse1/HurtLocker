@@ -95,7 +95,7 @@ public class Main {
         for(String key: map.keySet()){
             String outputName = String.format(formattedStringName, key, map.get(key).size());
             System.out.println(outputName);
-            System.out.println("===========     ===========");
+            System.out.println("=============       =============");
             Set<String> uniquePrice = new HashSet<>(map.get(key));
             for(int i = 0; i < uniquePrice.size(); i++){
                 // TODO: REPLACE map.get(key).size() with count from counter()
