@@ -22,8 +22,11 @@ public class Main  {
     // count() how many time I see the item and the prices.
     public static Integer counter(List<String> prices) {
         ArrayList<String> counts = new ArrayList<>();
+
+
+
         for (int i = 0; i < prices.size(); i++) {
-          if(pr)
+          if(){}
 
 
         }
