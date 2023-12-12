@@ -19,15 +19,16 @@ public class Main  {
     }
 
 
-    // count() how many time I see the item and the prices.
-    public static Integer counter(List<String> prices) {
-        ArrayList<String> counts = new ArrayList<>();
-
-
-
+    // count() how many time I see  the prices.
+    public static Integer counter(List<String> prices, String priceToCount) {
+       int count = 0;
         for (int i = 0; i < prices.size(); i++) {
-          if(){}
+         if(priceToCount.equals(prices.get(i))){
+             count++;
+         }
+
+          }
+        return count;
         }
-        return null;
+        p
     }
-}
