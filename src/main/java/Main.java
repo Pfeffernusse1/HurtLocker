@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -18,7 +19,7 @@ public class Main {
     public static void main(String[] args) throws Exception{
         String output = (new Main()).readRawDataToString();
         Map<String, List<String>> map = mainParse(output);
-        printToFile();
+        printToFile(map);
         //System.out.println(output);
 
     }
@@ -35,8 +36,8 @@ public class Main {
         }
         return count;
     }
-    public static Map<String, List<String>> mainParse(String data){
-        Map<String, List<String>> map = new HashMap<>();
+    public static Map<String, List<String>> mainParse(String data) throws Exception {
+        Map<String, List<String>> map = new LinkedHashMap<>();
         String regex = "##";
         Pattern pattern = Pattern.compile(regex);
         String[] items = pattern.split(data);
@@ -46,13 +47,19 @@ public class Main {
         */
 
         for(String item: items){
-            List<String> itemList = new ArrayList<>();//miniParse(item);
+            List<String> itemList = miniParse(item);
+
+            // checking cookies + variations of cookies, replacing the name in list with "cookies"
+            if(itemList.get(0) != null && itemList.get(0).matches("^c[\\w]*s$")){
+                itemList.set(0, "cookies");
+
+            }
 
             // if error is returned, up the count (tbc, dunno how we're doing error yet)
             // else if the map already has the grocery item in it,
             // add the price to the list
             // else create a new key-value pair
-            if(itemList.get(0).equals("error")){
+            if(itemList.contains(null)){
                 errCount++;
             }
             else if(map.containsKey(itemList.get(0))){
@@ -69,19 +76,8 @@ public class Main {
         return map;
     }
 
-    public static void printToFile(){
-        String formattedStringName = "name:%8s       seen: %s times";
-        String[] names = new String[]{"Milk", "Cookies", "Bread", "tacos"};
-        String[] times = new String[]{"6", "2", "4", "3"};
-
-        for(int i = 0; i < names.length; i++){
-            String output = String.format(formattedStringName, names[i], times[i]);
-            System.out.println(output);
-        }
-    }
-
-    public ArrayList<String> miniParse(String item) throws Exception {
-        String regex = "[$&+,;=?@#|'<>.^*()%!-]";
+    public static ArrayList<String> miniParse(String item) throws Exception {
+        String regex = "[$&+,;=?@#|'<>^*()%!-]";
         Pattern pattern = Pattern.compile(regex);
         String[] temp = pattern.split(item.toLowerCase());
         ArrayList<String> itemList = new ArrayList<>();
@@ -91,11 +87,37 @@ public class Main {
 //            Matcher matcher = patternTemp.matcher(items);
 //        }
         // temp[0] = {name: milk}
-        Pattern newPattern = Pattern.compile(":(.+)");
+        Pattern newPattern = Pattern.compile("(.+):");
         for(String items: temp){
             String[] newTemp = newPattern.split(items);
-            itemList.add(newTemp[0]);
+            if(newTemp.length == 0) {
+                itemList.add(null);
+            }
+            else{
+                itemList.add(newTemp[1]);
+                //System.out.println("in mini for: " + items + "       thing being added: " + newTemp[1]);
+            }
         }
         return itemList;
     }
+    public static void printToFile(Map<String, List<String>> map){
+        String formattedStringName = "\nname:%9s      seen: %s times\n==============      =============";
+        String formattedStringPrice =  "price:%8s      send: %s times\n--------------      -------------";
+
+        for(String key: map.keySet()){
+            String outputName = String.format(formattedStringName, key, map.get(key).size());
+            System.out.println(outputName);
+            if(key != "error"){
+                Set<String> uniquePrice = new HashSet<>(map.get(key));
+                Iterator iterator = uniquePrice.iterator();
+                while(iterator.hasNext()) {
+                    String price = (String) iterator.next();
+                    // TODO: REPLACE map.get(key).size() with count from counter()
+                    String outputPrice = String.format(formattedStringPrice, price, counter(map.get(key), price));
+                    System.out.println(outputPrice);
+                }
+            }
+        }
+    }
+
 }
