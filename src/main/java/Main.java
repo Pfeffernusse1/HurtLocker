@@ -1,11 +1,17 @@
 import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -97,23 +103,57 @@ public class Main {
         }
         return itemList;
     }
-    public static void printToFile (Map < String, List < String >> map){
-        String formattedStringName = "\nname:%9s      seen: %s times\n==============      =============";
-        String formattedStringPrice = "price:%8s      send: %s times\n--------------      -------------";
 
-        for (String key : map.keySet()) {
-            String outputName = String.format(formattedStringName, key, map.get(key).size());
-            System.out.println(outputName);
-            if (key != "error") {
-                Set<String> uniquePrice = new HashSet<>(map.get(key));
-                Iterator iterator = uniquePrice.iterator();
-                while (iterator.hasNext()) {
-                    String price = (String) iterator.next();
-                    // TODO: REPLACE map.get(key).size() with count from counter()
-                    String outputPrice = String.format(formattedStringPrice, price, counter(map.get(key), price));
-                    System.out.println(outputPrice);
+    public static String capitalizeFirstLetter(String groceryItem){
+        String firstLetterCap = "" + groceryItem.charAt(0);
+        return firstLetterCap.toUpperCase() + groceryItem.substring(1);
+    }
+
+    public static void printToFile (Map < String, List < String >> map) {
+        File file = new File("hurtlocker-results.txt");
+
+        try {
+            PrintWriter printWriter = new PrintWriter(file);
+
+            String formattedStringName = "name:%8s        seen: %s times\n=============        =============";
+            String formattedStringPrice = "Price:%7s        seen: %s times";
+            String formattedStringError = "Errors               seen: %s times";
+
+            for (String key : map.keySet()) {
+                String capitalizedKey = capitalizeFirstLetter(key);
+                String outputName = String.format(formattedStringName, capitalizedKey, map.get(key).size());
+                if(key.equals("error")){
+                    outputName = String.format(formattedStringError, map.get(key).size());
+                    printWriter.println(outputName);
+                }
+                else{
+                    printWriter.println(outputName);
+                }
+
+//                System.out.println(outputName);
+                if (key != "error") {
+                    Set<String> uniquePrice = new LinkedHashSet<>(map.get(key));
+                    Iterator iterator = uniquePrice.iterator();
+                    int count = 1;
+
+                    while (iterator.hasNext()) {
+                        String price = (String) iterator.next();
+                        // TODO: REPLACE map.get(key).size() with count from counter()
+                        String outputPrice = String.format(formattedStringPrice, price, counter(map.get(key), price));
+                        //System.out.println(outputPrice);
+                        printWriter.println(outputPrice);
+                        if(count == 1){
+                            printWriter.println("-------------        -------------");
+                        }
+                        count++;
+                    }
+                    printWriter.println();
                 }
             }
+            printWriter.close();
+        }
+        catch(IOException e){
+            System.out.println("HELP");
         }
     }
 }
